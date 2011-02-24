@@ -1,9 +1,17 @@
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
+using std::endl;
+using std::ofstream;
+using std::pair;
 using std::string;
+using std::stringstream;
 using std::vector;
 
 const int MIN_COUNT = 500;
@@ -116,8 +124,9 @@ void NameObjectE(double centre_x, double centre_y, double internal_radius,
 }
 
 void CreateArffFile(const string& file_name,
-                    const vector<pair<vector<double>, string>>& objects) {
-  ofstream arff(file_name + ".arff");
+                    const vector<pair<vector<double>, string> >& objects) {
+  string real_file_name = file_name + string(".arff");
+  ofstream arff(real_file_name.c_str());
   arff << "\% BEGIN OF ARFF FILE" << endl;
   arff << "\% Automatically generated ARFF file" << endl;
   arff << "\% Author: Pavel Zhernov" << endl;
@@ -138,7 +147,7 @@ void CreateArffFile(const string& file_name,
 }
 
 void CreateObjectsA(int count, double centre_x, double centre_y, double radius,
-                    vector<pair<vector<double>, string>>* objects) {
+                    vector<pair<vector<double>, string> >* objects) {
   objects->clear();
   for (int index = 0; index < count; ++index) {
     vector<double> object;
@@ -150,7 +159,7 @@ void CreateObjectsA(int count, double centre_x, double centre_y, double radius,
 }
 
 void CreateObjectsB(int count, double width, double height,
-                    vector<pair<vector<double>, string>>* objects) {
+                    vector<pair<vector<double>, string> >* objects) {
   objects->clear();
   for (int index = 0; index < count; ++index) {
     vector<double> object;
@@ -162,7 +171,7 @@ void CreateObjectsB(int count, double width, double height,
 }
 
 void CreateObjectsC(int count, int cells,
-                    vector<pair<vector<double>, string>>* objects) {
+                    vector<pair<vector<double>, string> >* objects) {
   objects->clear();
   for (int index = 0; index < count; ++index) {
     vector<double> object;
@@ -178,7 +187,7 @@ void CreateObjectsD(int count_zero, int count_first,
                     double Cov12_zero, double D2_zero,
                     double M1_first, double M2_first, double D1_first,
                     double Cov12_first, double D2_first,
-                    vector<pair<vector<double>, string>>* objects) {
+                    vector<pair<vector<double>, string> >* objects) {
   objects->clear();
   for (int index = 0; index < count_zero; ++index) {
     pair<vector<double>, string> object;
@@ -194,7 +203,7 @@ void CreateObjectsD(int count_zero, int count_first,
 
 void CreateObjectsE(int count, double centre_x, double centre_y,
                     double internal_radius, double external_radius,
-                    vector<pair<vector<double>, string>>* objects) {
+                    vector<pair<vector<double>, string> >* objects) {
   objects->clear();
   for (int index = 0; index < count; ++index) {
     vector<double> object;
@@ -210,10 +219,11 @@ void GenerateFilesA() {
     for (int multiplier = MIN_RADIUS; multiplier <= MAX_RADIUS; ++multiplier) {
       vector<pair<vector<double>, string> > objects;
       CreateObjectsA(count, CENTER_X, CENTER_Y, multiplier * STEP_RADIUS, &objects);
-      string file_name;
-      stringstream print_file_name(file_name);
+      stringstream print_file_name;
       print_file_name << "circle_" << count << "_objects_"
                       << multiplier * STEP_RADIUS << "_radius";
+      string file_name;
+      print_file_name >> file_name;
       CreateArffFile(file_name, objects);
     }
   }
@@ -225,11 +235,12 @@ void GenerateFilesB() {
       for (int multiplier_height = MIN_HEIGHT; multiplier_height <= MAX_HEIGHT; ++multiplier_height) {
         vector<pair<vector<double>, string> > objects;
         CreateObjectsB(count, multiplier_width * STEP_WIDTH, multiplier_height * STEP_HEIGHT, &objects);
-        string file_name;
-        stringstream print_file_name(file_name);
+        stringstream print_file_name;
         print_file_name << "saw_" << count << "_objects_"
                         << multiplier_width * STEP_WIDTH << "_width_"
                         << multiplier_height * STEP_HEIGHT << "_height";
+        string file_name;
+        print_file_name >> file_name;
         CreateArffFile(file_name, objects);
       }
     }
@@ -241,10 +252,11 @@ void GenerateFilesC() {
     for (int cells = MIN_CELLS; cells <= MAX_CELLS; ++cells) {
       vector<pair<vector<double>, string> > objects;
       CreateObjectsC(count, cells, &objects);
-      string file_name;
-      stringstream print_file_name(file_name);
+      stringstream print_file_name;
       print_file_name << "chess_" << count << "_objects_"
                       << cells << "_cells";
+      string file_name;
+      print_file_name >> file_name;
       CreateArffFile(file_name, objects);
     }
   }
@@ -255,9 +267,10 @@ void GenerateFilesD() {
     vector<pair<vector<double>, string> > objects;
     CreateObjectsD(count / 2, count / 2, M1_ZERO, M2_ZERO, D1_ZERO, COV12_ZERO, D2_ZERO,
                    M1_FIRST, M2_FIRST, D1_FIRST, COV12_FIRST, D2_FIRST, &objects);
-    string file_name;
-    stringstream print_file_name(file_name);
+    stringstream print_file_name;
     print_file_name << "normal_distribution_" << count << "_objects";
+    string file_name;
+    print_file_name >> file_name;
     CreateArffFile(file_name, objects);
   }
 }
@@ -270,11 +283,12 @@ void GenerateFilesE() {
           vector<pair<vector<double>, string> > objects;
           CreateObjectsE(count, CENTER_X, CENTER_Y, multiplier_internal * STEP_RADIUS,
                          multiplier_external * STEP_RADIUS, &objects);
-          string file_name;
-          stringstream print_file_name(file_name);
+          stringstream print_file_name;
           print_file_name << "circles_" << count << "_objects_"
                           << multiplier_internal * STEP_RADIUS << "_internal_radius_"
                           << multiplier_external * STEP_RADIUS << "external_radius";
+          string file_name;
+          print_file_name >> file_name;
           CreateArffFile(file_name, objects);
         }
       }
