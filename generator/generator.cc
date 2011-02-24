@@ -33,15 +33,15 @@ const int MAX_HEIGHT = 5;
 const double STEP_HEIGHT = 0.1;
 const int MIN_CELLS = 2;
 const int MAX_CELLS = 20;
-const double M1_ZERO = 0.3;
-const double M2_ZERO = 0.7;
-const double D1_ZERO = 0.1;
-const double COV12_ZERO = 0.01;
-const double D2_ZERO = 0.1;
-const double M1_FIRST = 0.7;
-const double M2_FIRST = 0.3;
-const double D1_FIRST = 0.1;
-const double COV12_FIRST = 0.01;
+const double M1_ZERO = 0.55;
+const double M2_ZERO = 0.45;
+const double D1_ZERO = 0.3;
+const double COV12_ZERO = 0.35;
+const double D2_ZERO = 0.7;
+const double M1_FIRST = 0.45;
+const double M2_FIRST = 0.55;
+const double D1_FIRST = 1;
+const double COV12_FIRST = 0.15;
 const double D2_FIRST = 0.1;
 
 void InitRandomSeed(int seed) {
@@ -82,7 +82,7 @@ void NameObjectB(double width, double height,
                  const vector<double>& object, string* name) {
   if (static_cast<int>(ceil(object[0] / (2 * width))) % 2 == 1) { /* / */
     double x_zone = object[0] - (2 * width) * floor(object[0] / (2 * width));
-    double y_zone = -(height / 2) + x_zone * height / width;
+    double y_zone = 0.5 - height / 2 + x_zone * height / width;
     if (object[1] > y_zone) {
       *name = string("first");
     } else {
@@ -91,7 +91,7 @@ void NameObjectB(double width, double height,
   } else { /* \ */
     double x_zone = object[0] - (2 * width) * floor(object[0] / (2 * width))
                   - width;
-    double y_zone = height / 2 - x_zone * height / width;
+    double y_zone = 0.5 + height / 2 - x_zone * height / width;
     if (object[1] > y_zone) {
       *name = string("first");
     } else {
