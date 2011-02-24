@@ -5,8 +5,11 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <vector>
 
+using std::cout;
 using std::endl;
 using std::ofstream;
 using std::pair;
@@ -144,6 +147,7 @@ void CreateArffFile(const string& file_name,
   }
   arff << "\% END OF ARFF FILE" << endl;
   arff.close();
+  cout << real_file_name << " has been generated" << endl;
 }
 
 void CreateObjectsA(int count, double centre_x, double centre_y, double radius,
@@ -220,7 +224,7 @@ void GenerateFilesA() {
       vector<pair<vector<double>, string> > objects;
       CreateObjectsA(count, CENTER_X, CENTER_Y, multiplier * STEP_RADIUS, &objects);
       stringstream print_file_name;
-      print_file_name << "circle_" << count << "_objects_"
+      print_file_name << "data/circle/circle_" << count << "_objects_"
                       << multiplier * STEP_RADIUS << "_radius";
       string file_name;
       print_file_name >> file_name;
@@ -236,7 +240,7 @@ void GenerateFilesB() {
         vector<pair<vector<double>, string> > objects;
         CreateObjectsB(count, multiplier_width * STEP_WIDTH, multiplier_height * STEP_HEIGHT, &objects);
         stringstream print_file_name;
-        print_file_name << "saw_" << count << "_objects_"
+        print_file_name << "data/saw/saw_" << count << "_objects_"
                         << multiplier_width * STEP_WIDTH << "_width_"
                         << multiplier_height * STEP_HEIGHT << "_height";
         string file_name;
@@ -253,7 +257,7 @@ void GenerateFilesC() {
       vector<pair<vector<double>, string> > objects;
       CreateObjectsC(count, cells, &objects);
       stringstream print_file_name;
-      print_file_name << "chess_" << count << "_objects_"
+      print_file_name << "data/chess/chess_" << count << "_objects_"
                       << cells << "_cells";
       string file_name;
       print_file_name >> file_name;
@@ -268,7 +272,8 @@ void GenerateFilesD() {
     CreateObjectsD(count / 2, count / 2, M1_ZERO, M2_ZERO, D1_ZERO, COV12_ZERO, D2_ZERO,
                    M1_FIRST, M2_FIRST, D1_FIRST, COV12_FIRST, D2_FIRST, &objects);
     stringstream print_file_name;
-    print_file_name << "normal_distribution_" << count << "_objects";
+    print_file_name << "data/normal_distribution/normal_distribution_"
+                    << count << "_objects";
     string file_name;
     print_file_name >> file_name;
     CreateArffFile(file_name, objects);
@@ -284,9 +289,9 @@ void GenerateFilesE() {
           CreateObjectsE(count, CENTER_X, CENTER_Y, multiplier_internal * STEP_RADIUS,
                          multiplier_external * STEP_RADIUS, &objects);
           stringstream print_file_name;
-          print_file_name << "circles_" << count << "_objects_"
+          print_file_name << "data/two_circles/two_circles_" << count << "_objects_"
                           << multiplier_internal * STEP_RADIUS << "_internal_radius_"
-                          << multiplier_external * STEP_RADIUS << "external_radius";
+                          << multiplier_external * STEP_RADIUS << "_external_radius";
           string file_name;
           print_file_name >> file_name;
           CreateArffFile(file_name, objects);
@@ -305,6 +310,13 @@ void GenerateAllFiles() {
 }
 
 int main() {
+  InitRandomSeed(239);
+  mkdir("data", 0755);
+  mkdir("data/circle", 0755);
+  mkdir("data/saw", 0755);
+  mkdir("data/chess", 0755);
+  mkdir("data/normal_distribution", 0755);
+  mkdir("data/two_circles", 0755);
   GenerateAllFiles();
   return 0;
 }
