@@ -18,7 +18,7 @@ using std::stringstream;
 using std::vector;
 
 const int MIN_COUNT = 500;
-const int MAX_COUNT = 10000;
+const int MAX_COUNT = 5000;
 const int STEP_COUNT = 500;
 const int MIN_RADIUS = 1;
 const int MAX_RADIUS = 5;
@@ -29,19 +29,19 @@ const int MIN_WIDTH = 1;
 const int MAX_WIDTH = 5;
 const double STEP_WIDTH = 0.1;
 const int MIN_HEIGHT = 1;
-const int MAX_HEIGHT = 5;
+const int MAX_HEIGHT = 3;
 const double STEP_HEIGHT = 0.1;
 const int MIN_CELLS = 2;
 const int MAX_CELLS = 20;
-const double M1_ZERO = 0.55;
-const double M2_ZERO = 0.45;
-const double D1_ZERO = 0.3;
-const double COV12_ZERO = 0.35;
-const double D2_ZERO = 0.7;
-const double M1_FIRST = 0.45;
-const double M2_FIRST = 0.55;
+const double M1_ZERO = 0.45;
+const double M2_ZERO = 0.55;
+const double D1_ZERO = 0.35;
+const double COV12_ZERO = 0.1;
+const double D2_ZERO = 0.15;
+const double M1_FIRST = 0.55;
+const double M2_FIRST = 0.45;
 const double D1_FIRST = 1;
-const double COV12_FIRST = 0.15;
+const double COV12_FIRST = 0.25;
 const double D2_FIRST = 0.1;
 
 void InitRandomSeed(int seed) {
@@ -60,8 +60,10 @@ void GenerateObject(vector<double>* object) {
 
 void GenerateObjectD(double M1, double M2, double D1, double Cov12, double D2,
                      const string& class_name, pair<vector<double>, string>* object) {
-  double rand_x = Random();
-  double rand_y = Random();
+  double r = Random();
+  double phi = Random();
+  double rand_x = sqrt(-2 * log(r)) * cos(2 * M_PI * phi);
+  double rand_y = sqrt(-2 * log(r)) * sin(2 * M_PI * phi);
   object->first.assign(2, 0);
   object->first[0] = M1 + sqrt(D1) * rand_x;
   object->first[1] = M2 + Cov12 / sqrt(D1) * rand_x + sqrt(D2 - Cov12 * Cov12 / D1) * rand_y;
@@ -71,7 +73,7 @@ void GenerateObjectD(double M1, double M2, double D1, double Cov12, double D2,
 void NameObjectA(double centre_x, double centre_y, double radius,
                  const vector<double>& object, string* name) {
   if ((object[0] - centre_x) * (object[0] - centre_x) +
-      (object[1] - centre_y) * (object[1] - centre_y) < radius) {
+      (object[1] - centre_y) * (object[1] - centre_y) < radius * radius) {
     *name = string("first");
   } else {
     *name = string("zero");
@@ -80,8 +82,8 @@ void NameObjectA(double centre_x, double centre_y, double radius,
 
 void NameObjectB(double width, double height,
                  const vector<double>& object, string* name) {
-  if (static_cast<int>(ceil(object[0] / (2 * width))) % 2 == 1) { /* / */
-    double x_zone = object[0] - (2 * width) * floor(object[0] / (2 * width));
+  if (static_cast<int>(ceil(object[0] / width)) % 2 == 1) { /* / */
+    double x_zone = object[0] - width * floor(object[0] / width);
     double y_zone = 0.5 - height / 2 + x_zone * height / width;
     if (object[1] > y_zone) {
       *name = string("first");
@@ -89,9 +91,8 @@ void NameObjectB(double width, double height,
       *name = string("zero");
     }
   } else { /* \ */
-    double x_zone = object[0] - (2 * width) * floor(object[0] / (2 * width))
-                  - width;
-    double y_zone = 0.5 + height / 2 - x_zone * height / width;
+    double x_zone = object[0] - width * floor(object[0] / width);
+    double y_zone = 0.5 - height / 2 + (width - x_zone) * height / width;
     if (object[1] > y_zone) {
       *name = string("first");
     } else {
@@ -114,11 +115,13 @@ void NameObjectE(double centre_x, double centre_y, double internal_radius,
                  double external_radius, const vector<double>& object,
                  string* name) {
   if ((object[0] - centre_x) * (object[0] - centre_x) +
-      (object[1] - centre_y) * (object[1] - centre_y) < internal_radius) {
+      (object[1] - centre_y) * (object[1] - centre_y) <
+      internal_radius * internal_radius) {
     *name = string("first");
   } else {
     if ((object[0] - centre_x) * (object[0] - centre_x) +
-        (object[1] - centre_y) * (object[1] - centre_y) > external_radius) {
+        (object[1] - centre_y) * (object[1] - centre_y) >
+        external_radius * external_radius) {
       *name = string("zero");
     } else {
       *name = ((rand() % 2 == 0) ? string("zero") : string("first"));
